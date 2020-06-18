@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>Speech Synthesis</title>
+        <meta name="description" content="">
+        <link href="https://fonts.googleapis.com/css2?family=Arizonia&display=swap" rel="stylesheet">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <style>
+        body{
+            background-image: url("https://www.itl.cat/pngfile/big/5-57631_painting-background-wallpaper-hd-watercolor-paint.jpg");
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-size: cover;
+        }
+        h1{
+            background-color: lightgreen;
+            color: white;
+            padding: 5px;
+            font-style: 'Arizonia', cursive;
+        }
+        .main{
+            width: 50vw;
+            margin: 10vh auto;
+            background-color: white;
+            box-shadow: rgba(255,0,0,0.4); 
+            border-radius: 5px;
+            padding: 10px;
+        }
+        .box,.main{
+            display: flex;
+            flex-direction: column; 
+
+        }
+        textarea,input,label{
+            margin-top: 5px;
+        }
+        textarea{
+            height: 15vh;
+        }
+        .buttons{
+            margin: 10px;
+            display: flex;
+            flex-direction: row;
+        }
+        button{
+            flex-grow:1;
+            padding: 10px;
+            margin: 5px;
+            background-color: lightgreen;
+        }
+        </style>
+    </head>
+    <body>
+        <div class="main">
+            <div class = "box">
+                <h1>The Voicenator 5000</h1>
+                <select name = "voice" id = "voices">   
+                    <option>Select a voice</option>
+                </select>
+
+                <label for = "rate">Rate:</label>
+                <input name = "rate" type = "range" min = "0" max = "3" value = "1" step = "0.1" >
+
+                <label for = "pitch">Pitch:</label>
+                <input name = "pitch" type = "range" min = "0" max = "2" value = "1" step = "0.1" >
+
+                <textarea name="text">Hello World! </textarea>
+            </div>
+            <div class = "buttons">
+                <button id = "stop">Stop!</button>
+                <button id = "speak">Speak</button>
+            </div>
+        </div>
+        
+        
+        
+        <script>
+            const msg = new SpeechSynthesisUtterance();
+            let voices = [];
+            const voicesDropdown = document.querySelector('[name="voice"]');
+            const options = document.querySelectorAll('[type = "range"], [name = "text"]');
+            const speakButton = document.querySelector('#speak');
+            const stopButton = document.querySelector('#stop');
+
+            function populateVoices() {
+                voices = this.getVoices();
+                voicesDropdown.innerHTML = voices
+                .filter(v => v.lang.includes('en'))
+                .map( voice => `<option value="${voice.name}">${voice.name} ${voice.lang}</option>`).join('');
+                
+            }
+            function setVoice(){
+                msg.voice = voices.find( voice => voice.name === this.value);  
+                toggle();  
+            }
+            function toggle( start = true){
+                speechSynthesis.cancel();
+                if( start ){
+                    speechSynthesis.speak(msg);
+                }
+                
+            }
+            function respondOptions(){
+                msg[this.name] = this.value;
+                toggle();
+            }
+
+            msg.text = document.querySelector('[name="text"]').value;
+            var synth = window.speechSynthesis;
+            synth.addEventListener('voiceschanged', populateVoices);
+            voicesDropdown.addEventListener('change', setVoice);
+            options.forEach(element => { element.addEventListener('change', respondOptions)
+                
+            });
+            speakButton.addEventListener('click', toggle);
+            stopButton.addEventListener('click',toggle.bind(null,false));
+        
+        </script>
+    </body>
+</html>
